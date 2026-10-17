@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="GlycoLens: AI-powered hypoglycemia early-warning & Indian meal carb estimator. Decision-support only.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GlycoLens">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <title>GlycoLens — AI Diabetes Decision Support</title>
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #F8FAFC;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    #loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .brand-icon {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #00695C, #004D40);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0, 105, 92, 0.25);
+      margin-bottom: 18px;
+    }
+    .brand-icon svg {
+      width: 40px;
+      height: 40px;
+      fill: #FFFFFF;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0F172A;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.5px;
+    }
+    .brand-subtitle {
+      font-size: 13px;
+      color: #64748B;
+      margin: 0 0 24px 0;
+      font-weight: 500;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3.5px solid rgba(0, 105, 92, 0.15);
+      border-top-color: #00695C;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-container">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+    <div class="brand-title">GlycoLens</div>
+    <div class="brand-subtitle">AI Hypo Forecaster & Indian Meal Carb Estimator</div>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Floating Install App Banner for Android Chrome -->
+  <div id="pwa-install-banner" style="display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:99999; background:linear-gradient(135deg, #00695C, #004D40); color:white; padding:12px 22px; border-radius:28px; box-shadow:0 8px 24px rgba(0,0,0,0.35); font-weight:800; font-size:14px; cursor:pointer; align-items:center; gap:8px;">
+    <span>📲 Install GlycoLens App</span>
+  </div>
+
+  <script>
+    // Register Network-First PWA Service Worker for 100% Chrome Android Installability
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('flutter_service_worker.js?v=2.3')
+          .then(function(reg) {
+            console.log('GlycoLens ServiceWorker active:', reg.scope);
+          })
+          .catch(function(err) {
+            console.warn('GlycoLens ServiceWorker error:', err);
+          });
+      });
+    }
+
+    // Capture Chrome PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('pwa-install-banner');
+      if (banner) {
+        banner.style.display = 'flex';
+        banner.onclick = () => {
+          banner.style.display = 'none';
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choice) => {
+            deferredPrompt = null;
+          });
+        };
+      }
+    });
+    // Phone System Notifications Handler (Lockscreen / Status Bar)
+    window.requestPhoneNotificationPermission = async function() {
+      if (!('Notification' in window)) {
+        console.warn('Notifications not supported in this browser.');
+        return false;
+      }
+      if (Notification.permission === 'granted') return true;
+      try {
+        const perm = await Notification.requestPermission();
+        return perm === 'granted';
+      } catch (e) {
+        console.warn('Permission request error:', e);
+        return false;
+      }
+    };
+
+    window.sendPhoneNotification = function(title, body, tag) {
+      if (!('Notification' in window)) return;
+
+      const options = {
+        body: body,
+        icon: 'icons/Icon-192.png',
+        badge: 'icons/Icon-192.png',
+        vibrate: [300, 100, 300, 100, 300],
+        tag: tag || 'glycolens-alert',
+        renotify: true,
+        requireInteraction: true
+      };
+
+      if (Notification.permission === 'granted') {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.ready.then(function(reg) {
+            reg.showNotification(title, options);
+          }).catch(function() {
+            try { new Notification(title, options); } catch(e) {}
+          });
+        } else {
+          try { new Notification(title, options); } catch(e) {}
+        }
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(function(perm) {
+          if (perm === 'granted') {
+            window.sendPhoneNotification(title, body, tag);
+          }
+        });
+      }
+    };
+  </script>
+
+  <!-- Invisible Demo Voiceover Controller (Press F or click top-right corner) -->
+  <button id="invisible-voice-trigger" onclick="toggleDemoAudio()" style="position:fixed; top:0; right:0; width:80px; height:80px; opacity:0; z-index:999999; cursor:pointer; border:none; background:transparent;" title="Press F to Play/Pause Demo Voiceover"></button>
+
+  <script>
+    const demoVoiceAudio = new Audio('audio/slide5_livedemo.mp3?v=' + Date.now());
+    let isDemoVoicePlaying = false;
+
+    window.toggleDemoAudio = function() {
+      if (isDemoVoicePlaying) {
+        demoVoiceAudio.pause();
+        isDemoVoicePlaying = false;
+        console.log('Demo voice paused');
+      } else {
+        demoVoiceAudio.play().then(function() {
+          isDemoVoicePlaying = true;
+          console.log('Demo voice playing');
+        }).catch(function(err) {
+          console.warn('Playback error:', err);
+        });
+      }
+    };
+
+    window.resetDemoAudio = function() {
+      demoVoiceAudio.currentTime = 0;
+      demoVoiceAudio.play().then(function() {
+        isDemoVoicePlaying = true;
+      });
+    };
+
+    demoVoiceAudio.onended = function() {
+      isDemoVoicePlaying = false;
+      demoVoiceAudio.currentTime = 0;
+    };
+
+    // Press 'F' or 'f' to toggle voiceover, 'R' to restart
+    window.addEventListener('keydown', function(e) {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        return;
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        window.toggleDemoAudio();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        window.resetDemoAudio();
+      }
+    }, true);
+  </script>
+  <script src="flutter_bootstrap.js?v=20261017_1222" async></script>
+</body>
+</html>

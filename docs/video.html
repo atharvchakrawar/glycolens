@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlycoLens — Kinetic Motion Graphics Pitch Video</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&family=Cabinet+Grotesk:wght@800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #030712;
+      --teal: #14B8A6;
+      --teal-light: #5EEAD4;
+      --teal-glow: rgba(20, 184, 166, 0.4);
+      --amber: #F59E0B;
+      --amber-glow: rgba(245, 158, 11, 0.4);
+      --red: #EF4444;
+      --red-glow: rgba(239, 68, 68, 0.4);
+      --blue: #38BDF8;
+      --purple: #A855F7;
+      --white: #F8FAFC;
+      --muted: #94A3B8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+      user-select: none;
+      cursor: default;
+    }
+
+    /* 60 FPS Kinetic Canvas Layer */
+    #kinetic-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    /* Dynamic Camera & Motion Viewport */
+    #motion-viewport {
+      position: relative;
+      z-index: 10;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      pointer-events: none;
+    }
+
+    /* Cinematic Motion Frame */
+    .motion-scene {
+      position: absolute;
+      width: 90%;
+      max-width: 1300px;
+      height: 85%;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transform-style: preserve-3d;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .motion-scene.active {
+      display: flex;
+      animation: sceneZoomIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes sceneZoomIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(30px) rotateX(4deg);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotateX(0);
+      }
+    }
+
+    /* Kinetic Text & Holographic Glyphs */
+    .kinetic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 20px;
+      background: rgba(20, 184, 166, 0.12);
+      border: 1px solid rgba(20, 184, 166, 0.4);
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--teal-light);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      box-shadow: 0 0 30px var(--teal-glow);
+      margin-bottom: 24px;
+      animation: badgeGlow 2.5s infinite alternate;
+    }
+    @keyframes badgeGlow {
+      from { box-shadow: 0 0 15px rgba(20, 184, 166, 0.2); }
+      to { box-shadow: 0 0 35px rgba(20, 184, 166, 0.6); }
+    }
+
+    .kinetic-title {
+      font-size: 72px;
+      font-weight: 900;
+      letter-spacing: -2.5px;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #FFFFFF 20%, #A5F3FC 60%, #14B8A6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.8));
+    }
+
+    .kinetic-subtitle {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--muted);
+      max-width: 860px;
+      line-height: 1.45;
+      margin-bottom: 36px;
+    }
+
+    /* Floating Animated 3D Cards */
+    .cards-row {
+      display: flex;
+      gap: 28px;
+      width: 100%;
+      max-width: 1150px;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .video-card {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1.5px solid rgba(255, 255, 255, 0.12);
+      border-radius: 28px;
+      padding: 36px 30px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(20px);
+      transform: translateY(0);
+      transition: all 0.4s ease;
+      animation: cardFloat 6s ease-in-out infinite alternate;
+    }
+
+    .video-card:nth-child(2) { animation-delay: -3s; }
+    .video-card:nth-child(3) { animation-delay: -1.5s; }
+
+    @keyframes cardFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-10px) rotate(0.4deg); }
+    }
+
+    .video-card.glow-teal { border-color: rgba(20, 184, 166, 0.5); box-shadow: 0 15px 50px rgba(20, 184, 166, 0.25); }
+    .video-card.glow-amber { border-color: rgba(245, 158, 11, 0.5); box-shadow: 0 15px 50px rgba(245, 158, 11, 0.25); }
+    .video-card.glow-red { border-color: rgba(239, 68, 68, 0.5); box-shadow: 0 15px 50px rgba(239, 68, 68, 0.25); }
+
+    .card-badge-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    .card-text {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Kinetic Heartbeat Blood Drop Logo */
+    .blood-drop-logo {
+      width: 110px;
+      height: 110px;
+      background: radial-gradient(circle at 35% 35%, #EF4444, #991B1B);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 60px rgba(239, 68, 68, 0.6), inset 0 0 25px rgba(255, 255, 255, 0.4);
+      margin-bottom: 30px;
+      animation: heartbeat 2s ease-in-out infinite;
+      position: relative;
+    }
+    .blood-drop-logo::after {
+      content: "⚡";
+      transform: rotate(45deg);
+      font-size: 44px;
+      color: #FFFFFF;
+      text-shadow: 0 0 20px rgba(255,255,255,0.8);
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: rotate(-45deg) scale(1); box-shadow: 0 0 50px rgba(239, 68, 68, 0.5); }
+      14% { transform: rotate(-45deg) scale(1.15); box-shadow: 0 0 80px rgba(239, 68, 68, 0.85); }
+      28% { transform: rotate(-45deg) scale(1.02); }
+      42% { transform: rotate(-45deg) scale(1.12); box-shadow: 0 0 75px rgba(239, 68, 68, 0.75); }
+      70% { transform: rotate(-45deg) scale(1); }
+    }
+
+    /* Animated 3D Mobile Phone in Video */
+    .video-phone-stage {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      max-width: 1100px;
+    }
+
+    .video-phone-device {
+      width: 360px;
+      height: 520px;
+      background: #000000;
+      border: 8px solid #334155;
+      border-radius: 44px;
+      padding: 16px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.9), 0 0 50px rgba(20, 184, 166, 0.25);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      animation: phoneTilt 8s ease-in-out infinite alternate;
+    }
+    @keyframes phoneTilt {
+      0% { transform: rotateY(-10deg) rotateX(5deg); }
+      100% { transform: rotateY(10deg) rotateX(-5deg); }
+    }
+
+    .phone-speaker-pill {
+      width: 90px;
+      height: 18px;
+      background: #111827;
+      border-radius: 12px;
+      margin: 0 auto 16px auto;
+    }
+
+    /* Spring-Loaded Animated Lockscreen Push Notification */
+    .spring-push-notification {
+      background: rgba(30, 41, 59, 0.95);
+      border: 1.5px solid var(--amber);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 30px rgba(245, 158, 11, 0.3);
+      animation: springDrop 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      text-align: left;
+    }
+    @keyframes springDrop {
+      0% { transform: translateY(-60px) scale(0.85); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Pipeline Animated Nodes */
+    .kinetic-pipeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1180px;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .pipeline-box {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.85);
+      border: 2px solid var(--teal);
+      border-radius: 22px;
+      padding: 24px 20px;
+      box-shadow: 0 0 35px rgba(20, 184, 166, 0.25);
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+    .pipeline-box::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      animation: lightSweep 3s infinite;
+    }
+    @keyframes lightSweep {
+      0% { left: -100%; }
+      50%, 100% { left: 100%; }
+    }
+
+    .pulse-connector {
+      font-size: 32px;
+      color: var(--teal);
+      animation: connectorZoom 1.2s infinite alternate;
+    }
+    @keyframes connectorZoom {
+      from { transform: scale(0.9); opacity: 0.5; }
+      to { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Live Animated Data Metrics Bar */
+    .metrics-bar {
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 1180px;
+      background: rgba(20, 184, 166, 0.08);
+      border: 1.5px solid rgba(20, 184, 166, 0.3);
+      border-radius: 20px;
+      padding: 16px 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+    }
+    .metrics-bar span { color: var(--teal); font-weight: 800; font-size: 18px; }
+
+    /* =======================================================
+       INVISIBLE PLAY / PAUSE CONTROLS & HUD
+       ======================================================= */
+    /* Full-Screen Invisible Click Hit-Zone */
+    #invisible-hit-zone {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background: transparent;
+      border: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Dynamic Play / Pause Flash Icon in Center of Screen */
+    #flash-hud {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.7);
+      width: 100px;
+      height: 100px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 2px solid var(--teal);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      color: var(--teal);
+      box-shadow: 0 0 60px rgba(20, 184, 166, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10000;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #flash-hud.visible {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* 3px Ultra-Sleek Bottom Video Progress Line */
+    #video-progress-line {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--teal), var(--amber), var(--red));
+      box-shadow: 0 0 15px var(--teal);
+      z-index: 10000;
+      transition: width 0.25s linear;
+    }
+
+    /* Auto-hiding HUD help text */
+    #hud-hint {
+      position: fixed;
+      bottom: 16px;
+      right: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.35);
+      z-index: 10000;
+      pointer-events: none;
+      transition: opacity 1.5s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 60 FPS Kinetic Canvas Background (Real-time ECG wave, particles, neural graph) -->
+  <canvas id="kinetic-canvas"></canvas>
+
+  <!-- Invisible Hit Zone (Click anywhere to Play/Pause) -->
+  <button id="invisible-hit-zone" title="Click anywhere or press Space to Play / Pause"></button>
+
+  <!-- Momentary Flash Indicator -->
+  <div id="flash-hud">▶</div>
+
+  <!-- Progress Line -->
+  <div id="video-progress-line"></div>
+
+  <!-- Auto-fading Hint -->
+  <div id="hud-hint">[Click / Space: Play • F11: Fullscreen]</div>
+
+  <!-- ================= DYNAMIC MOTION STAGE ================= -->
+  <div id="motion-viewport">
+
+    <!-- SCENE 1: KINETIC HOOK -->
+    <div class="motion-scene active" id="scene-0">
+      <div class="blood-drop-logo"></div>
+      <div class="kinetic-badge">⚡ Pitch & Prototype Demo • Team Binary Duo</div>
+      <h1 class="kinetic-title">GLYCOLENS</h1>
+      <p class="kinetic-subtitle">
+        Proactive <span style="color:var(--teal-light); text-shadow:0 0 20px var(--teal);">Hypoglycemia Early-Warning</span> AI<br>
+        Calibrated in <span style="color:var(--amber); text-shadow:0 0 20px var(--amber);">Rotis & Katoris</span>, Not Grams.
+      </p>
+      <div style="display:flex; gap:20px; font-family:'JetBrains Mono', monospace; font-size:14px; color:var(--muted);">
+        <div>Atharva Chakrawar</div>
+        <div>•</div>
+        <div>Kaushik Chaudhari</div>
+        <div>•</div>
+        <div style="color:var(--teal); font-weight:800;">Healthcare & Wellbeing Track</div>
+      </div>
+    </div>
+
+    <!-- SCENE 2: THE DUAL CRISIS -->
+    <div class="motion-scene" id="scene-1">
+      <div class="kinetic-badge" style="color:#FCA5A5; border-color:rgba(239,68,68,0.5); background:rgba(239,68,68,0.12);">
+        ⚠️ The Reality of Type 1 Diabetes in India
+      </div>
+      <h2 class="kinetic-title" style="font-size:52px;">
+        850,000+ Lives on an <span style="color:var(--red); text-shadow:0 0 25px var(--red);">Insulin Tightrope</span>
+      </h2>
+      <div class="cards-row" style="margin-top:20px;">
+        <div class="video-card glow-red">
+          <div class="card-badge-icon" style="background:rgba(239,68,68,0.2); border-color:var(--red); color:var(--red);">🚨</div>
+          <div class="card-title">1. Reactive Alarms = Too Late</div>
+          <p class="card-text">
+            CGMs only alarm <strong>AFTER dropping below 70 mg/dL</strong>.
+            Patients are already dizzy, trembling, and impaired with zero digestion window.
+            Causes <strong>30% of acute emergency hospitalizations</strong>.
+          </p>
+        </div>
+        <div class="video-card glow-amber">
+          <div class="card-badge-icon" style="background:rgba(245,158,11,0.2); border-color:var(--amber); color:var(--amber);">⚖️</div>
+          <div class="card-title">2. The Gram Scale Failure</div>
+          <p class="card-text">
+            Western apps ask for <em>"120g boiled dal"</em>.
+            <strong>Nobody brings a digital weighing scale to an Indian family dinner!</strong>
+            We eat composite meals in Rotis & Katoris. Dosing by guesswork triggers severe nighttime lows.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: THE DUAL PILLARS -->
+    <div class="motion-scene" id="scene-2">
+      <div class="kinetic-badge">🔮 The GlycoLens Solution</div>
+      <h2 class="kinetic-title" style="font-size:52px;">
+        Proactive AI in <span style="color:var(--teal-light); text-shadow:0 0 25px var(--teal);">Rotis & Katoris</span>
+      </h2>
+      <div class="cards-row" style="margin-top:20px;">
+        <div class="video-card glow-teal">
+          <div class="card-badge-icon" style="background:rgba(20,184,166,0.2); border-color:var(--teal); color:var(--teal);">🧠</div>
+          <div class="card-title">Pillar 1: PyTorch LSTM Velocity Core</div>
+          <p class="card-text">
+            Evaluates continuous glucose velocity ($\Delta G / \Delta t$) and active insulin on board to forecast levels <strong>30 to 60 minutes into the future</strong>, warning patients before physical symptoms hit.
+          </p>
+        </div>
+        <div class="video-card glow-amber">
+          <div class="card-badge-icon" style="background:rgba(245,158,11,0.2); border-color:var(--amber); color:var(--amber);">🍛</div>
+          <div class="card-title">Pillar 2: Cultural Indian Nutrition Engine</div>
+          <p class="card-text">
+            Directly mapped to the official <strong>ICMR-NIN Indian Food Composition Tables (IFCT 2017)</strong>.
+            Translates household portions into instant Net Carbs, Dietary Fiber, and Glycemic Load.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 4: CLINICAL PROTOCOLS -->
+    <div class="motion-scene" id="scene-3">
+      <div class="kinetic-badge">🛡️ Clinical Safety & Protocols</div>
+      <h2 class="kinetic-title" style="font-size:50px;">
+        Safety-First <span style="color:var(--teal-light); text-shadow:0 0 20px var(--teal);">Decision Support</span>
+      </h2>
+      <div class="cards-row" style="margin-top:20px;">
+        <div class="video-card glow-teal">
+          <div class="card-badge-icon">📊</div>
+          <div class="card-title">Velocity Gauge & 90% Cone</div>
+          <p class="card-text">Dynamic triage colors with a 90% confidence interval cone ($\pm 1.96 \times \text{RMSE}$) reflecting biological variability.</p>
+        </div>
+        <div class="video-card glow-amber">
+          <div class="card-badge-icon">⏱️</div>
+          <div class="card-title">Rule of 15 Rescue Protocol</div>
+          <p class="card-text">Guides patient to take 15g fast carbs and starts a 15-minute countdown timer to prevent dangerous rebound spikes to 300+ mg/dL.</p>
+        </div>
+        <div class="video-card glow-teal">
+          <div class="card-badge-icon">📜</div>
+          <div class="card-title">Non-Device CDS Compliance</div>
+          <p class="card-text">Complies with CDSCO and FDA non-device clinical decision support guidelines, keeping the human in full control.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 5: LIVE PROTOTYPE & ALERT -->
+    <div class="motion-scene" id="scene-4">
+      <div class="kinetic-badge">📱 Working Prototype Live on Phone</div>
+      <h2 class="kinetic-title" style="font-size:46px;">
+        Sub-15ms AI Alert & <span style="color:var(--teal-light); text-shadow:0 0 20px var(--teal);">Lockscreen Push</span>
+      </h2>
+      <div class="video-phone-stage" style="margin-top:16px;">
+        <!-- 3D Smartphone Device with Animated Notification -->
+        <div class="video-phone-device">
+          <div class="phone-speaker-pill"></div>
+          <div class="spring-push-notification">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:11px; font-weight:800; color:var(--amber);">GLYCOLENS • JUST NOW</span>
+              <span style="font-size:11px; color:var(--muted);">Lockscreen Push</span>
+            </div>
+            <div style="font-size:15px; font-weight:800; color:var(--white); margin-bottom:6px;">
+              ⚠️ Hypo Warning: Predicted in ~38 mins
+            </div>
+            <div style="font-size:12.5px; color:var(--muted); line-height:1.45;">
+              Glucose dropping to 58 mg/dL. Eat a fruit (banana/apple) or 15g carbs now to control and prevent a crash!
+            </div>
+          </div>
+          <div style="margin-top:20px; padding:16px; background:rgba(15,23,42,0.8); border-radius:18px; border:1px solid #1E293B;">
+            <div style="font-size:11px; color:var(--teal); font-weight:800; margin-bottom:6px;">LUNCH LOGGED IN ROTIS & KATORIS</div>
+            <div style="font-size:14px; font-weight:800; color:var(--white);">2 Rotis + 1 Dal + 1 Rice</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:4px;">Net Carbs: 59.7g • Fiber: 9.9g • GL: 39</div>
+          </div>
+        </div>
+
+        <!-- Animated Side Explanations -->
+        <div style="flex:1; text-align:left;">
+          <div class="video-card glow-teal" style="margin-bottom:20px;">
+            <div class="card-title" style="color:var(--teal-light);">⚡ 15-Minute Advance Detection</div>
+            <p class="card-text">
+              When a drop begins, PyTorch catches downward velocity in <strong>under 15 milliseconds</strong>.
+              Phone vibrates and delivers an actionable nutrition recommendation directly to the lockscreen.
+            </p>
+          </div>
+          <div class="video-card glow-amber">
+            <div class="card-title" style="color:var(--amber);">🫓 Instant Meal Logging</div>
+            <p class="card-text">
+              Patients simply tap portions: <em>2 Rotis, 1 Katori Dal</em>.
+              No scales. SQLite persistence and forecast recalculation in 13.2 milliseconds.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 6: ARCHITECTURE -->
+    <div class="motion-scene" id="scene-5">
+      <div class="kinetic-badge">🏗️ Technology Stack & Benchmarks</div>
+      <h2 class="kinetic-title" style="font-size:50px;">
+        High-Performance <span style="color:var(--teal-light); text-shadow:0 0 20px var(--teal);">System Architecture</span>
+      </h2>
+      <div class="kinetic-pipeline">
+        <div class="pipeline-box">
+          <div style="font-size:11px; font-weight:800; color:var(--teal); margin-bottom:4px;">CLIENT LAYER</div>
+          <div style="font-size:18px; font-weight:800;">Flutter PWA</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:6px;">Network-First SW • W3C Web Push • Zero Stale Cache</div>
+        </div>
+        <div class="pulse-connector">➔</div>
+        <div class="pipeline-box">
+          <div style="font-size:11px; font-weight:800; color:var(--amber); margin-bottom:4px;">API GATEWAY</div>
+          <div style="font-size:18px; font-weight:800;">Python FastAPI</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:6px;">Async IO • Sub-15ms Latency • SQLite ACID</div>
+        </div>
+        <div class="pulse-connector">➔</div>
+        <div class="pipeline-box">
+          <div style="font-size:11px; font-weight:800; color:var(--teal); margin-bottom:4px;">ML CORE</div>
+          <div style="font-size:18px; font-weight:800;">PyTorch LSTM</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:6px;">12-Step Lookback • Velocity Aware • RMSE 12.5 mg/dL</div>
+        </div>
+        <div class="pulse-connector">➔</div>
+        <div class="pipeline-box">
+          <div style="font-size:11px; font-weight:800; color:var(--blue); margin-bottom:4px;">COMPUTER VISION</div>
+          <div style="font-size:18px; font-weight:800;">YOLOv8 + IFCT</div>
+          <div style="font-size:12px; color:var(--muted); margin-top:6px;">9cm Tableware Anchor • ICMR-NIN Food DB</div>
+        </div>
+      </div>
+      <div class="metrics-bar">
+        <div>⚡ PyTorch Inference: <span>2.44 ms</span></div>
+        <div>⚡ End-to-End Meal Log: <span>13.19 ms</span></div>
+        <div>🎯 Forecaster RMSE: <span>12.5 mg/dL</span></div>
+        <div>📦 Architecture: <span>Flutter + FastAPI + SQLite</span></div>
+      </div>
+    </div>
+
+    <!-- SCENE 7: IMPACT -->
+    <div class="motion-scene" id="scene-6">
+      <div class="kinetic-badge">🚀 Clinical Impact & Commercial Roadmap</div>
+      <h2 class="kinetic-title" style="font-size:50px;">
+        Preventing Crises, <span style="color:var(--teal-light); text-shadow:0 0 20px var(--teal);">Empowering Lives</span>
+      </h2>
+      <div class="cards-row" style="margin-top:20px;">
+        <div class="video-card glow-teal">
+          <div class="card-badge-icon">💰</div>
+          <div class="card-title">₹15,000 – ₹50,000 Saved Per Avoided ER Visit</div>
+          <p class="card-text">
+            Hypoglycemia is the #1 driver of acute T1D hospitalizations.
+            A 30-minute early warning gives patients time to eat, stopping crashes before cognitive loss.
+            Boosts meal logging adherence from <strong>&lt;20% to &gt;85%</strong>.
+          </p>
+        </div>
+        <div class="video-card glow-amber">
+          <div class="card-badge-icon">📡</div>
+          <div class="card-title">Future Expansion Roadmap</div>
+          <p class="card-text">
+            <strong>1. Direct Bluetooth BLE:</strong> Native telemetry pairing with Abbott FreeStyle Libre and Dexcom G7.<br>
+            <strong>2. Vernacular Voice Input:</strong> AI speech-to-carb logging in Hindi, Tamil, Telugu, and Marathi.<br>
+            <strong>3. Pediatric Telemetry:</strong> Automated WhatsApp emergency alerts to parents when a child drops low.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 8: FINALE -->
+    <div class="motion-scene" id="scene-7">
+      <div class="blood-drop-logo" style="background:radial-gradient(circle at 35% 35%, #14B8A6, #004D40); box-shadow:0 0 60px rgba(20,184,166,0.6);"></div>
+      <div class="kinetic-badge">Final Round Submission</div>
+      <h1 class="kinetic-title" style="font-size:64px;">GLYCOLENS</h1>
+      <p class="kinetic-subtitle" style="max-width:750px;">
+        Proactive AI Early-Warnings + Cultural Indian Nutrition.<br>
+        Right in your pocket.
+      </p>
+      <div style="background:rgba(15,23,42,0.85); border:1.5px solid rgba(20,184,166,0.4); border-radius:24px; padding:24px 44px; max-width:700px; margin-bottom:28px; text-align:left; box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+        <p style="font-size:15px; margin-bottom:10px;">✅ <strong>Sub-15ms</strong> AI Velocity Inference & Logging</p>
+        <p style="font-size:15px; margin-bottom:10px;">✅ <strong>Native Phone Vibration</strong> & Lockscreen Push Alerts</p>
+        <p style="font-size:15px; margin-bottom:10px;">✅ Scientifically Mapped to <strong>ICMR-NIN IFCT 2017</strong></p>
+        <p style="font-size:15px;">✅ Full <strong>Non-Device Clinical Decision Support</strong> Compliance</p>
+      </div>
+      <div style="font-size:17px; font-weight:800; color:var(--teal-light); text-shadow:0 0 20px var(--teal);">
+        Thank you! We are Team Binary Duo — Ready for your questions.
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =======================================================
+    // 60 FPS CONTINUOUS MOTION GRAPHICS ANIMATION ENGINE
+    // =======================================================
+    const canvas = document.getElementById('kinetic-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    // Dynamic ECG Waveform parameters
+    let time = 0;
+    const wavePoints = [];
+    const maxWavePoints = 200;
+
+    // Glowing Bio-Particles
+    const particles = [];
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2.5 + 1,
+        speedX: (Math.random() - 0.5) * 0.6,
+        speedY: (Math.random() - 0.5) * 0.6,
+        alpha: Math.random() * 0.5 + 0.2,
+        color: Math.random() > 0.4 ? '#14B8A6' : '#F59E0B'
+      });
+    }
+
+    function render60FPS() {
+      time += 0.03;
+      ctx.clearRect(0, 0, width, height);
+
+      // 1. Draw Subtle Animated Cyber Grid
+      ctx.strokeStyle = 'rgba(30, 58, 95, 0.15)';
+      ctx.lineWidth = 1;
+      const gridSize = 60;
+      const offsetX = (time * 10) % gridSize;
+      for (let x = offsetX; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // 2. Continuous Glowing Glucose Waveform at Bottom
+      const waveY = height * 0.88;
+      ctx.beginPath();
+      ctx.strokeStyle = currentSceneIdx === 1 ? '#EF4444' : '#14B8A6';
+      ctx.lineWidth = 2.5;
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = currentSceneIdx === 1 ? 'rgba(239, 68, 68, 0.8)' : 'rgba(20, 184, 166, 0.8)';
+
+      for (let x = 0; x < width; x += 8) {
+        // Compose smooth multi-harmonic continuous ECG wave
+        const freq1 = Math.sin((x * 0.005) + time * 1.5) * 22;
+        const freq2 = Math.sin((x * 0.015) - time * 2.2) * 10;
+        const spike = Math.exp(-Math.pow(((x + (time * 120) % width) % 350 - 175) / 18, 2)) * -55;
+        const y = waveY + freq1 + freq2 + spike;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0; // reset
+
+      // 3. Floating Interactive Light Particles
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      requestAnimationFrame(render60FPS);
+    }
+    render60FPS();
+
+    // =======================================================
+    // SCENE SYNCHRONIZATION WITH VOICE 2 (GUY)
+    // =======================================================
+    const scenes = document.querySelectorAll('.motion-scene');
+    const progressBar = document.getElementById('video-progress-line');
+    const flashHud = document.getElementById('flash-hud');
+    const hudHint = document.getElementById('hud-hint');
+    const hitZone = document.getElementById('invisible-hit-zone');
+
+    let currentSceneIdx = 0;
+    let isPlaying = false;
+
+    // Slide Audio URLs (Using Voice 2 - Guy)
+    const audioClips = [
+      'audio/slide1_cover.mp3',
+      'audio/slide2_problem.mp3',
+      'audio/slide3_solution.mp3',
+      'audio/slide4_features.mp3',
+      'audio/slide5_livedemo.mp3',
+      'audio/slide6_architecture.mp3',
+      'audio/slide7_impact.mp3',
+      'audio/slide8_conclusion.mp3'
+    ];
+
+    const audioPlayer = new Audio();
+
+    audioPlayer.onended = () => {
+      if (isPlaying && currentSceneIdx < scenes.length - 1) {
+        setTimeout(() => {
+          goToScene(currentSceneIdx + 1);
+          playCurrentSceneAudio();
+        }, 500);
+      } else if (currentSceneIdx === scenes.length - 1) {
+        isPlaying = false;
+        showFlashIcon('✓');
+      }
+    };
+
+    audioPlayer.ontimeupdate = () => {
+      if (audioPlayer.duration) {
+        const percent = ((currentSceneIdx + (audioPlayer.currentTime / audioPlayer.duration)) / scenes.length) * 100;
+        progressBar.style.width = `${percent}%`;
+      }
+    };
+
+    function showFlashIcon(icon) {
+      flashHud.innerText = icon;
+      flashHud.classList.add('visible');
+      setTimeout(() => flashHud.classList.remove('visible'), 500);
+    }
+
+    function goToScene(index) {
+      scenes.forEach((sc, i) => {
+        sc.classList.toggle('active', i === index);
+      });
+      currentSceneIdx = index;
+    }
+
+    function playCurrentSceneAudio() {
+      if (currentSceneIdx >= 0 && currentSceneIdx < audioClips.length) {
+        audioPlayer.src = audioClips[currentSceneIdx];
+        audioPlayer.play().catch(e => console.log('Audio playback prevented until interaction:', e));
+      }
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        audioPlayer.pause();
+        isPlaying = false;
+        showFlashIcon('⏸');
+      } else {
+        isPlaying = true;
+        showFlashIcon('▶');
+        if (!audioPlayer.src || audioPlayer.ended) {
+          playCurrentSceneAudio();
+        } else {
+          audioPlayer.play().catch(e => console.log(e));
+        }
+      }
+    }
+
+    // Click anywhere on screen triggers Play / Pause
+    hitZone.addEventListener('click', togglePlay);
+
+    // Keyboard Shortcuts (Space, K, Fullscreen F11)
+    window.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'k' || e.key === 'K') {
+        e.preventDefault();
+        togglePlay();
+      } else if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        if (currentSceneIdx < scenes.length - 1) {
+          goToScene(currentSceneIdx + 1);
+          if (isPlaying) playCurrentSceneAudio();
+        }
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        if (currentSceneIdx > 0) {
+          goToScene(currentSceneIdx - 1);
+          if (isPlaying) playCurrentSceneAudio();
+        }
+      } else if (e.key === 'f' || e.key === 'F' || e.key === 'F11') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      }
+    });
+
+    // Auto-fade HUD text
+    setTimeout(() => {
+      hudHint.style.opacity = '0';
+    }, 4500);
+  </script>
+</body>
+</html>

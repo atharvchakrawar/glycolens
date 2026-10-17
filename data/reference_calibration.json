@@ -1,0 +1,40 @@
+{
+  "reference_objects": {
+    "katori": {
+      "name": "Standard Indian Stainless Steel Katori (Bowl)",
+      "standard_diameter_cm": 9.0,
+      "standard_area_sq_cm": 63.6,
+      "reference_volume_ml": 150.0,
+      "standard_liquid_grams": 150.0,
+      "standard_dense_curry_grams": 150.0,
+      "standard_rice_grams": 120.0
+    },
+    "thali_plate": {
+      "name": "Standard Indian Dinner Thali Plate",
+      "standard_diameter_cm": 28.0,
+      "standard_area_sq_cm": 615.75,
+      "coverage_depth_factor": 1.2
+    },
+    "quarter_plate": {
+      "name": "Quarter / Side Plate",
+      "standard_diameter_cm": 18.0,
+      "standard_area_sq_cm": 254.47,
+      "coverage_depth_factor": 1.0
+    }
+  },
+  "density_factors_g_per_sq_cm": {
+    "roti": 0.55,
+    "paratha": 0.70,
+    "rice": 1.88,
+    "dal": 2.35,
+    "curry": 2.35,
+    "salad": 1.0,
+    "dry_sabzi": 1.5,
+    "default": 1.5
+  },
+  "confidence_thresholds": {
+    "auto_accept_min": 0.70,
+    "flag_review_below": 0.70,
+    "min_detection_confidence": 0.25
+  }
+}

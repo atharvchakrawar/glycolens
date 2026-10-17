@@ -1,0 +1,35 @@
+# Virtual Environment
+backend/venv/
+venv/
+env/
+ENV/
+
+# Python cache & testing
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+*.log
+
+# Binaries & executables
+cloudflared.exe
+*.exe
+
+# Flutter & Dart build caches (keep web build output)
+mobile/.dart_tool/
+mobile/.packages
+mobile/.pub/
+mobile/build/test_cache/
+mobile/build/*.dill
+mobile/build/*.cache
+mobile/build/*.snapshot
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+
+# Database temporary files
+*.sqlite3-journal
+*.db-journal
+
+# OS files
+.DS_Store
+Thumbs.db

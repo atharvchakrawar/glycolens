@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlycoLens — Final Round Pitch Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0A192F;
+      --card: #162642;
+      --card-border: #1E3A5F;
+      --teal: #14B8A6;
+      --teal-dark: #00695C;
+      --white: #F8FAFC;
+      --muted: #94A3B8;
+      --amber: #F59E0B;
+      --red: #EF4444;
+      --green: #22C55E;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+    /* Presentation Header */
+    header {
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 25, 47, 0.85);
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: white;
+    }
+    .brand-name { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+    .brand-pill {
+      font-size: 11px;
+      background: rgba(20, 184, 166, 0.15);
+      color: var(--teal);
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      color: var(--white);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--teal-dark); border-color: var(--teal); }
+    .btn-primary { background: var(--teal); color: #0A192F; border: none; }
+    .btn-primary:hover { background: #0D9488; }
+    .slide-counter { font-size: 13px; color: var(--muted); font-weight: 700; min-width: 70px; text-align: center; }
+
+    /* Slide Deck Container */
+    #deck {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+    .slide {
+      position: absolute;
+      width: 92%;
+      max-width: 1200px;
+      height: 84%;
+      background: var(--card);
+      border: 1.5px solid var(--card-border);
+      border-radius: 24px;
+      padding: 44px 52px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+    .slide.active { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-tag {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      color: var(--teal);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .slide-title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: var(--white);
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+
+    /* Grid Layouts */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; flex: 1; }
+    .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; flex: 1; }
+
+    .sub-card {
+      background: rgba(10, 25, 47, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .sub-card h3 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sub-card ul { list-style: none; }
+    .sub-card li {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 18px;
+    }
+    .sub-card li::before {
+      content: "•";
+      color: var(--teal);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+    .sub-card li strong { color: var(--white); }
+
+    /* Architecture Visual Diagram */
+    .arch-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      justify-content: center;
+    }
+    .arch-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .arch-node {
+      flex: 1;
+      background: rgba(10, 25, 47, 0.8);
+      border: 1.5px solid var(--card-border);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: left;
+    }
+    .arch-node.teal { border-color: var(--teal); }
+    .arch-node.amber { border-color: var(--amber); }
+    .arch-node.green { border-color: var(--green); }
+    .arch-node.red { border-color: var(--red); }
+    .arch-node .node-tag { font-size: 10px; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; }
+    .arch-node .node-title { font-size: 14px; font-weight: 800; color: var(--white); margin-bottom: 4px; }
+    .arch-node .node-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+    .arch-arrow { color: var(--teal); font-size: 20px; font-weight: 900; }
+
+    /* Benchmark Strip */
+    .benchmarks {
+      margin-top: 14px;
+      background: rgba(20, 184, 166, 0.08);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      border-radius: 12px;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-around;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--white);
+    }
+    .benchmarks span { color: var(--teal); font-weight: 700; }
+
+    /* Title Slide Specific */
+    .hero-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+    }
+    .hero-logo {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, var(--teal), var(--teal-dark));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin-bottom: 20px;
+      box-shadow: 0 10px 30px rgba(20, 184, 166, 0.35);
+    }
+    .hero-title { font-size: 46px; font-weight: 900; letter-spacing: -1px; margin-bottom: 12px; }
+    .hero-subtitle { font-size: 20px; font-weight: 600; color: var(--muted); max-width: 750px; margin-bottom: 26px; line-height: 1.4; }
+    .hero-tag {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* Key Action Indicators */
+    .key-indicator {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11.5px;
+      color: var(--muted);
+      display: flex;
+      gap: 16px;
+      z-index: 100;
+    }
+    kbd {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      color: var(--white);
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">G</div>
+      <div>
+        <div class="brand-name">GlycoLens</div>
+      </div>
+      <span class="brand-pill">Final Round Presentation</span>
+    </div>
+    <div class="nav-controls">
+      <button class="btn" onclick="prevSlide()">◀ Prev</button>
+      <div class="slide-counter" id="counter">1 / 8</div>
+      <button class="btn" onclick="nextSlide()">Next ▶</button>
+      <button class="btn btn-primary" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <a href="/" target="_blank" class="btn" style="text-decoration:none;">📱 Open Live App</a>
+    </div>
+  </header>
+
+  <main id="deck">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active">
+      <div class="hero-center">
+        <div class="hero-logo">🩸</div>
+        <h1 class="hero-title">GLYCOLENS</h1>
+        <p class="hero-subtitle">AI-Powered Hypoglycemia Early-Warning & Cultural Indian Meal Carb Estimator</p>
+        <span class="hero-tag">From Reactive Panic to Proactive Prevention in Rotis & Katoris</span>
+        <p style="margin-top:28px; font-size:13px; color:var(--muted);">Final Round Pitch & Prototype Demonstration • Top 15 Finalist</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: PROBLEM & TARGET USERS (PART 1) -->
+    <section class="slide">
+      <div class="slide-tag">Part 1 • Problem & Target Users</div>
+      <h2 class="slide-title">The Dual Dilemma: Reactive Alarms & The Indian Diet Blindspot</h2>
+      <div class="grid-3">
+        <div class="sub-card" style="border-top: 3px solid var(--teal);">
+          <h3 style="color:var(--teal);">👥 Target Users</h3>
+          <ul>
+            <li><strong>850,000+ Type 1 Diabetics</strong> living in India, with rapid pediatric diagnoses every year.</li>
+            <li>Patients take <strong>exogenous insulin daily</strong>; dosing is an unforgiving tightrope walk.</li>
+            <li><strong>Severe Hypo (<54 mg/dL)</strong> causes 30% of emergency room hospitalizations.</li>
+            <li>Constant <strong>nocturnal anxiety</strong>: Fear of seizures and unconsciousness while sleeping.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-top: 3px solid var(--red);">
+          <h3 style="color:var(--red);">⚠️ Problem 1: Reactive Alarms</h3>
+          <ul>
+            <li>Current CGMs (Dexcom/Libre) alarm <strong>AFTER</strong> dropping below 70 mg/dL.</li>
+            <li>At &lt;70 mg/dL, patients are <strong>already dizzy, trembling, and impaired</strong>.</li>
+            <li><strong>Zero early-warning window</strong> to digest food before crashing.</li>
+            <li>Leads to panic binge-eating and dangerous <strong>rebound spikes to 300+ mg/dL</strong>.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-top: 3px solid var(--amber);">
+          <h3 style="color:var(--amber);">🍛 Problem 2: Indian Diet Dilemma</h3>
+          <ul>
+            <li>Western apps (MyFitnessPal) demand raw gram weights: <em>"120g boiled yellow dal"</em>.</li>
+            <li><strong>Nobody weighs a chapati</strong> at an Indian family dinner or wedding!</li>
+            <li>Indian meals are composite and served in <strong>Rotis & Katoris</strong>.</li>
+            <li>Results in blind dosage guessing and frequent post-meal crashes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: PROPOSED SOLUTION (PART 2) -->
+    <section class="slide">
+      <div class="slide-tag">Part 2 • Proposed Solution</div>
+      <h2 class="slide-title">GlycoLens: Proactive AI Forecasting in Rotis & Katoris</h2>
+      <div class="grid-3">
+        <div class="sub-card" style="border-top: 3px solid var(--teal);">
+          <h3 style="color:var(--teal);">🔮 01. Proactive PyTorch LSTM</h3>
+          <p style="font-size:12px; color:var(--teal); font-weight:700; margin-bottom:8px;">Predicts 30 to 60 Minutes Ahead</p>
+          <ul>
+            <li>Trained on temporal CGM time-series sequences.</li>
+            <li>Evaluates <strong>rate-of-change velocity</strong> ($\Delta G / \Delta t$) and Active Insulin.</li>
+            <li>Detects impending crashes <strong>before physical symptoms start</strong>.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-top: 3px solid var(--amber);">
+          <h3 style="color:var(--amber);">🫓 02. Cultural Nutrition Engine</h3>
+          <p style="font-size:12px; color:var(--amber); font-weight:700; margin-bottom:8px;">Calibrated to Rotis & 9cm Katoris</p>
+          <ul>
+            <li>Eliminates the gram scale entirely.</li>
+            <li>Mapped to <strong>ICMR-National Institute of Nutrition (IFCT 2017)</strong> tables.</li>
+            <li>Calculates <strong>Net Carbs = Total Carbs - Fiber</strong> and Glycemic Load.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-top: 3px solid var(--green);">
+          <h3 style="color:var(--green);">📲 03. Native Phone Warning</h3>
+          <p style="font-size:12px; color:var(--green); font-weight:700; margin-bottom:8px;">Vibrating Lockscreen Push Alert</p>
+          <ul>
+            <li>Bypasses in-app silos via <strong>W3C Web Notification API</strong>.</li>
+            <li>Phone buzzes 35+ mins ahead: <em>"Glucose dropping to 58 mg/dL. Eat a fruit or 15g carbs now!"</em></li>
+            <li>Actionable dietary advice delivered directly to lockscreen.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: KEY FEATURES & SAFETY (PART 3) -->
+    <section class="slide">
+      <div class="slide-tag">Part 3 • Key Features & Safety</div>
+      <h2 class="slide-title">Clinical Features & Safety-First Decision Support</h2>
+      <div class="grid-2">
+        <div class="sub-card" style="border-left: 3px solid var(--teal);">
+          <h3 style="color:var(--teal);">⚡ Velocity-Aware Glucose Gauge</h3>
+          <ul>
+            <li><strong>Dynamic Rate of Change:</strong> Calculates glucose velocity in mg/dL per minute.</li>
+            <li><strong>Instant Clinical Triage:</strong> Green In-Range (70-180), Amber Warning (54-70), Red Critical (&lt;54).</li>
+            <li><strong>90% Confidence Interval Cone:</strong> Visualizes biological variability ($\pm 1.96 \times \text{RMSE}$) so patients understand prediction uncertainty.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-left: 3px solid var(--amber);">
+          <h3 style="color:var(--amber);">⏱️ Clinical "Rule of 15" Protocol</h3>
+          <ul>
+            <li><strong>ADA Gold Standard:</strong> Official protocol for treating hypoglycemia safely.</li>
+            <li><strong>Step 1:</strong> Take exactly 15g fast carbs (fruit juice, 3 tsp sugar, jaggery).</li>
+            <li><strong>Step 2:</strong> 15-minute countdown timer stops panic overeating.</li>
+            <li><strong>Step 3:</strong> Phone buzzes at 15m to prompt mandatory blood glucose re-check.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-left: 3px solid var(--green);">
+          <h3 style="color:var(--green);">📜 Non-Device CDS Regulatory Compliance</h3>
+          <ul>
+            <li>Strictly designed as <strong>Clinical Decision Support (CDS)</strong> under CDSCO and FDA guidelines.</li>
+            <li>Persistent regulatory disclaimers throughout all interfaces.</li>
+            <li>Does not autonomously command insulin pumps; informs and empowers the human patient.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-left: 3px solid var(--teal);">
+          <h3 style="color:var(--teal);">🍽️ Dual-Mode Indian Food Logging</h3>
+          <ul>
+            <li><strong>Camera AI Scan:</strong> Tableware-calibrated dish detection (9cm katori optical anchor).</li>
+            <li><strong>Manual Household Builder:</strong> One-tap buttons for <em>[-] 2 Rotis [+]</em> and <em>[-] 1 Katori Dal [+]</em>.</li>
+            <li>Instant SQLite persistence with local timeline caching.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: LIVE DEMO TRANSITION CUE (PART 4) -->
+    <section class="slide">
+      <div class="slide-tag">Part 4 • Live Prototype Demonstration</div>
+      <h2 class="slide-title">Live Working Prototype Demonstration</h2>
+      <div class="sub-card" style="flex:1; justify-content:center; align-items:center; text-align:center; padding:30px;">
+        <div style="font-size:48px; margin-bottom:12px;">📱</div>
+        <h3 style="font-size:22px; color:var(--teal); margin-bottom:12px;">Switching to Live Mobile Screen Mirror</h3>
+        <p style="font-size:14px; color:var(--muted); max-width:680px; margin-bottom:20px; line-height:1.6;">
+          Watch the live mobile app running on phone: <strong>Live Dial</strong> ➔ <strong>Post-Meal Low Simulation</strong> ➔ <strong>Native Phone Lockscreen Vibration</strong> ➔ <strong>Logging Lunch in Rotis & Katoris</strong> ➔ <strong>History Timeline</strong> ➔ <strong>Rule of 15 Timer</strong>.
+        </p>
+        <div style="display:flex; gap:12px;">
+          <a href="/" target="_blank" class="btn btn-primary" style="text-decoration:none; padding:10px 22px; font-size:14px;">Open Live Web App</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: TECHNOLOGY & ARCHITECTURE (PART 5) -->
+    <section class="slide">
+      <div class="slide-tag">Part 5 • Technology & Implementation</div>
+      <h2 class="slide-title">End-to-End System Architecture & Stack</h2>
+      <div class="arch-flow">
+        <div class="arch-row">
+          <div class="arch-node teal">
+            <div class="node-tag" style="color:var(--teal);">CLIENT LAYER</div>
+            <div class="node-title">Flutter Mobile PWA</div>
+            <div class="node-desc">Network-First Service Worker • W3C Web Notification API • Haptic Vibration • Zero Stale Cache</div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-node amber">
+            <div class="node-tag" style="color:var(--amber);">GATEWAY & API</div>
+            <div class="node-title">Python FastAPI</div>
+            <div class="node-desc">Async Non-blocking IO • Sub-15ms Latency • Latency Middleware • SQLite ACID Persistence</div>
+          </div>
+        </div>
+
+        <div class="arch-row">
+          <div class="arch-node green">
+            <div class="node-tag" style="color:var(--green);">ML INFERENCE CORE</div>
+            <div class="node-title">PyTorch LSTM Forecaster</div>
+            <div class="node-desc">12-Step Lookback Window • Features: [Glucose, Velocity, IOB, COB] • Dual +30m/+60m Multi-Step • RMSE 12.5 mg/dL</div>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-node red">
+            <div class="node-tag" style="color:var(--red);">NUTRITIONAL INTELLIGENCE</div>
+            <div class="node-title">ICMR-NIN IFCT 2017 & YOLOv8</div>
+            <div class="node-desc">YOLOv8 9cm Tableware Calibration • Net Carbs = Total - Fiber • Glycemic Load Scoring • Household Sizing</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="benchmarks">
+        <div>⚡ PyTorch Inference: <span>2.44 ms</span></div>
+        <div>⚡ End-to-End Meal Logging: <span>13.19 ms</span></div>
+        <div>🎯 Forecast RMSE: <span>12.5 mg/dL</span></div>
+        <div>📦 Architecture: <span>Flutter + FastAPI + SQLite</span></div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: IMPACT & ROADMAP (PART 6 & 7) -->
+    <section class="slide">
+      <div class="slide-tag">Part 6 & 7 • Impact & Roadmap</div>
+      <h2 class="slide-title">Clinical Impact, Feasibility & Future Scope</h2>
+      <div class="grid-2">
+        <div class="sub-card" style="border-top: 3px solid var(--teal);">
+          <h3 style="color:var(--teal);">🏥 Clinical & Economic Impact</h3>
+          <ul>
+            <li><strong>Severe Hypo Prevention:</strong> 30-min window enables dietary rescue before cognitive loss.</li>
+            <li><strong>Saves Out-of-Pocket Hospital Bills:</strong> Prevents emergency admissions saving <strong>₹15,000–₹50,000 per avoided ER visit</strong>.</li>
+            <li><strong>Overcomes Gram-Scale Fatigue:</strong> Eliminates weighing scales, boosting meal logging adherence from &lt;20% to <strong>&gt;85%</strong>.</li>
+            <li><strong>Peace of Mind for Parents:</strong> Reduces fear of fatal nocturnal hypoglycemia in children.</li>
+          </ul>
+        </div>
+        <div class="sub-card" style="border-top: 3px solid var(--amber);">
+          <h3 style="color:var(--amber);">🚀 Commercial Roadmap</h3>
+          <ul>
+            <li><strong>Direct Bluetooth BLE Telemetry:</strong> Native pairing with Abbott FreeStyle Libre and Dexcom G7 sensors.</li>
+            <li><strong>Vernacular Voice Input:</strong> AI speech-to-carb logging in <strong>Hindi, Tamil, Telugu, and Marathi</strong>.</li>
+            <li><strong>Pediatric Telemetry:</strong> Automated WhatsApp/SMS alerts to parents when a child drops low at school.</li>
+            <li><strong>Smart Insulin Pen Sync:</strong> Closed-loop insulin-on-board bolus verification.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: SUMMARY & THANK YOU -->
+    <section class="slide">
+      <div class="hero-center">
+        <div class="hero-logo" style="background:linear-gradient(135deg, var(--teal), #004D40);">✓</div>
+        <h1 class="hero-title">GLYCOLENS</h1>
+        <p class="hero-subtitle">Empowering Indian Type 1 Diabetics with Proactive AI & Culturally Calibrated Nutrition</p>
+        <div style="background:rgba(22, 38, 66, 0.8); border:1px solid var(--card-border); border-radius:16px; padding:18px 32px; max-width:600px; margin-bottom:24px; text-align:left;">
+          <p style="font-size:13px; color:var(--white); margin-bottom:6px;">✅ <strong>Sub-15ms</strong> AI Inference & Logging Latency</p>
+          <p style="font-size:13px; color:var(--white); margin-bottom:6px;">✅ <strong>Native Phone Vibration</strong> & Lockscreen Push Alerts</p>
+          <p style="font-size:13px; color:var(--white); margin-bottom:6px;">✅ Scientifically Mapped to <strong>ICMR-NIN IFCT 2017</strong></p>
+          <p style="font-size:13px; color:var(--white);">✅ Full <strong>Non-Device Clinical Decision Support</strong> Compliance</p>
+        </div>
+        <span class="hero-tag">Thank you! We look forward to your questions.</span>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="key-indicator">
+    <span>Navigate: <kbd>◀</kbd> <kbd>▶</kbd> or <kbd>Space</kbd></span>
+    <span>Fullscreen: <kbd>F11</kbd></span>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('counter');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+      slides.forEach((s, i) => {
+        s.classList.toggle('active', i === index);
+      });
+      currentSlide = index;
+      counter.innerText = `${currentSlide + 1} / ${slides.length}`;
+    }
+
+    function nextSlide() {
+      if (currentSlide < slides.length - 1) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === 'Home') {
+        showSlide(0);
+      } else if (e.key === 'End') {
+        showSlide(slides.length - 1);
+      }
+    });
+
+    // Touch swipe navigation
+    let touchStartX = 0;
+    let touchEndX = 0;
+    window.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+    window.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) nextSlide();
+      if (touchEndX - touchStartX > 50) prevSlide();
+    });
+  </script>
+</body>
+</html>
